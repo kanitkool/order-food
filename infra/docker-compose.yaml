@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:3.9
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    restart: always
+  kafka:
+    image: docker.io/bitnami/kafka:3.5.2
+    ports:
+      - ${FORWARD_KAFKA_PORT-9093}:9093
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_ENABLE_KRAFT=no
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - BITNAMI_DEBUG=true
+    depends_on:
+      - zookeeper
+    restart: always
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    ports:
+      - ${FORWARD_KAFKA_UI_PORT-26002}:26002
+    environment:
+      - DYNAMIC_CONFIG_ENABLED=true
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    depends_on:
+      - kafka
+    restart: always
+  redis:
+    image: redis:latest
+    ports:
+      - ${FORWARD_REDIS_PORT-6379}:6379
+    restart: always
+  redis-commander:
+    image: ghcr.io/joeferner/redis-commander:0.8
+    ports:
+      - ${FORWARD_REDIS_COMMANDER_PORT-8081}:8081
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    restart: always

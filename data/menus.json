@@ -1,0 +1,16 @@
+[
+    {
+        "restaurantId": "1",
+        "menuId": "1",
+        "name": "Pizza",
+        "description": "Delicious cheese pizza",
+        "price": 9.99
+    },
+    {
+        "restaurantId": "2",
+        "menuId": "2",
+        "name": "Burger",
+        "description": "Juicy beef burger",
+        "price": 5.99
+    }
+]
